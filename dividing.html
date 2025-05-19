@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabzilla - Dividing</title>
+    <link rel="stylesheet" href="style2.css">
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="home-btn" title="Home">
+            <img src="img/tabzilla-logo.jpeg" alt="Home" style="width: 50px; height: 50px; border-radius:50%";>
+        </a>
+        <a href="index.html" class="small-green-btn" style="margin-bottom: 18px; display: inline-block;">Go Back</a>
+        <h1 style="color:#14532d;font-family:'Impact','Arial Black',sans-serif;letter-spacing:2px;font-size:2.7rem;text-align:center;margin:0 auto 18px auto;">Tabzilla</h1>
+        <p>Now let's divide the bill!</p>
+
+        <form id="guest-form" style="display: flex; gap: 40px; align-items: flex-start;">
+            <div id="guest-list" style="flex: 1;">
+                <div class="guest-row">
+                    <input type="text" class="guest-name" placeholder="Guest name 1">
+                </div>
+                <div class="guest-row">
+                    <input type="text" class="guest-name" placeholder="Guest name 2">
+                </div>
+            </div>
+            <div id="items-list" style="flex: 1;"></div>
+        </form>
+        <button id="lock-btn" type="button" class="small-green-btn" style="margin-top:18px;">Ready to Split</button>
+
+        <br>
+        <br>
+    </div>
+    <script src="dividing.js"></script>
+    <script>
+    // Display the dictionary values as rows like guest names
+    document.addEventListener('DOMContentLoaded', function() {
+        const itemsDict = JSON.parse(localStorage.getItem('billSplitter_itemsDict') || '{}');
+        const itemsDiv = document.getElementById('items-list');
+        if (Object.keys(itemsDict).length === 0) {
+            itemsDiv.innerHTML = '<em>No items found.</em>';
+        } else {
+            let html = '';
+            let idx = 1;
+            for (const [item, price] of Object.entries(itemsDict)) {
+                html += `<div class="guest-row"><input type="text" class="guest-name" value="${item}" readonly style="background:#f5f5f5;"><input type="number" class="guest-name" value="${price.toFixed(2)}" readonly style="background:#f5f5f5;max-width:120px;min-width:80px;text-align:right;"></div>`;
+                idx++;
+            }
+            itemsDiv.innerHTML = html;
+        }
+
+        // Lock/Unlock logic for guest names
+        const lockBtn = document.getElementById('lock-btn');
+        const guestInputs = () => Array.from(document.querySelectorAll('#guest-list .guest-name'));
+        let locked = false;
+        lockBtn.addEventListener('click', function() {
+            // Save guest names and assignments to localStorage
+            const guestNames = guestInputs().map(input => input.value.trim()).filter(Boolean);
+            localStorage.setItem('billSplitter_guestNames', JSON.stringify(guestNames));
+            // Optionally, save assignments if you have them
+            // localStorage.setItem('billSplitter_assignments', JSON.stringify(assignments));
+            // Go to summary page
+            window.location.href = 'summary.html';
+        });
+    });
+    </script>
+</body>
+</html>

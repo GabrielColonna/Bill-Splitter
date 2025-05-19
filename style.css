@@ -1,0 +1,190 @@
+body {
+    background: url('img/green-plaid.jpg') center center/cover no-repeat fixed;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 32px 24px;
+}
+
+h1 {
+    color: #2d6a4f;
+    margin-bottom: 8px;
+}
+
+p {
+    color: #555;
+    margin-bottom: 24px;
+}
+
+.button-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.button-group button {
+    background-color: #2d6a4f;
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 16px 32px;
+    border: none;
+    border-radius: 32px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(44, 62, 80, 0.08);
+}
+
+.button-group button:hover {
+    background-color: #40916c;
+}
+
+.green-btn {
+    background-color: #2d6a4f;
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 16px 32px;
+    border: none;
+    border-radius: 32px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(44, 62, 80, 0.08);
+    width: 100%;
+    margin-top: 24px;
+}
+
+.green-btn:hover {
+    background-color: #40916c;
+}
+
+.small-green-btn {
+    background-color: #2d6a4f;
+    color: #fff;
+    font-size: 1rem;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 32px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(44, 62, 80, 0.08);
+    margin-top: 20px;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.small-green-btn:hover {
+    background-color: #40916c;
+}
+
+#manual-form {
+    width: 100%;
+}
+
+#item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.item-row {
+    display: flex;
+    gap: 16px;
+}
+
+.item-name, .item-price {
+    flex: 1;
+    padding: 12px 10px;
+    border: 2px solid #2d6a4f;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #ffffff;
+}
+
+.item-price {
+    max-width: 120px;
+}
+
+.item-name:focus, .item-price:focus {
+    outline: 2px solid #2d6a4f;
+    background: #e9fbe5;
+}
+
+.tip-calc-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+#tip-type, #tip-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid #2d6a4f;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #ffffff;
+}
+
+#tip-type:focus, #tip-input:focus {
+    outline: 2px solid #2d6a4f;
+    background: #e9fbe5;
+}
+
+#tip-label {
+    min-width: 120px;
+}
+
+.guest-row {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.guest-name {
+    flex: 1;
+    padding: 12px 10px;
+    border: 2px solid #2d6a4f;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #ffffff;
+}
+
+.guest-name:focus {
+    outline: 2px solid #2d6a4f;
+    background: #e9fbe5;
+}
+
+.ticket-summary {
+    background: #f5f5f5;
+    border: 2px solid #bbb;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+    padding: 24px 32px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+    border-left: 6px solid #bbb;
+    border-right: 6px solid #bbb;
+}
+
+.ticket-summary div {
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.ticket-summary strong {
+    font-weight: bold;
+}

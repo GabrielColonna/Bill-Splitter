@@ -1,6 +1,4 @@
 #Gabriel Colonna
-#COP2500
-#4/8/23
 #Bill Splitter
 
 #The purpose is to split the bill based on what each person ate.

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabzilla - Summary</title>
+    <link rel="stylesheet" href="style2.css">
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="home-btn" title="Home">
+            <img src="img/tabzilla-logo.jpeg" alt="Home" style="width: 50px; height: 50px; border-radius:50%";>
+        </a>
+        <a href="dividing.html" class="small-green-btn" style="margin-bottom: 18px; display: inline-block;">Go Back</a>
+        <h1 style="color:#14532d;font-family:'Impact','Arial Black',sans-serif;letter-spacing:2px;font-size:2.7rem;text-align:center;margin:0 auto 18px auto;">Tabzilla</h1>
+        <p>Summary of your bill and split:</p>
+        <form id="summary-form" style="display: flex; gap: 40px; align-items: flex-start;">
+            <div id="summary-guest-list" style="flex: 1;"></div>
+            <div id="summary-items-list" style="flex: 1;"></div>
+        </form>
+        <div id="assignment-info" style="margin-top:24px; display: flex; gap: 32px;"></div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load guest names
+        const guestNames = JSON.parse(localStorage.getItem('billSplitter_guestNames') || '[]');
+        const guestDiv = document.getElementById('summary-guest-list');
+        let guestHtml = '';
+        guestNames.forEach((name, idx) => {
+            guestHtml += `<div class="guest-row guest-row-select" data-guest="${idx}"><input type="text" class="guest-name" value="${name}" readonly></div>`;
+        });
+        guestDiv.innerHTML = guestHtml;
+        // Load items
+        const itemsDict = JSON.parse(localStorage.getItem('billSplitter_itemsDict') || '{}');
+        const itemsDiv = document.getElementById('summary-items-list');
+        let itemsHtml = '';
+        for (const [item, price] of Object.entries(itemsDict)) {
+            itemsHtml += `<div class="guest-row item-row-select" data-item="${encodeURIComponent(item)}"><input type="text" class="guest-name item-name-box" value="${item}" readonly style="background:#f5f5f5;cursor:pointer;"><input type="number" class="guest-name" value="${price.toFixed(2)}" readonly style="background:#f5f5f5;max-width:120px;min-width:80px;text-align:right;"></div>`;
+        }
+        itemsDiv.innerHTML = itemsHtml;
+        // Show ticket summary under the list of food items
+        const summaryForm = document.getElementById('summary-form');
+        let ticketDiv = document.getElementById('summary-ticket');
+        if (!ticketDiv) {
+            ticketDiv = document.createElement('div');
+            ticketDiv.id = 'summary-ticket';
+            ticketDiv.style = 'width:100%;margin:24px 0 0 0;';
+            summaryForm.parentNode.insertBefore(ticketDiv, summaryForm.nextSibling);
+        }
+        function updateTicketSummary() {
+            // Get values from localStorage
+            const itemsDict = JSON.parse(localStorage.getItem('billSplitter_itemsDict') || '{}');
+            const subtotal = Object.values(itemsDict).reduce((sum, val) => sum + val, 0);
+            let tipType = localStorage.getItem('billSplitter_tipType');
+            let tipValue = parseFloat(localStorage.getItem('billSplitter_tipValue'));
+            let tipAmount = 0;
+            if (tipType === 'percent') {
+                tipAmount = subtotal * (tipValue / 100);
+            } else if (tipType === 'fixed') {
+                tipAmount = tipValue;
+            } else {
+                tipAmount = 0;
+            }
+            let taxRate = parseFloat(localStorage.getItem('billSplitter_taxRate'));
+            if (isNaN(taxRate)) taxRate = 0.07;
+            const taxAmount = subtotal * taxRate;
+            const grandTotal = subtotal + taxAmount + tipAmount;
+            ticketDiv.innerHTML = `
+                <div class="ticket-summary">
+                    <div><strong>Subtotal:</strong> $${subtotal.toFixed(2)}</div>
+                    <div><strong>Tax (${(taxRate*100).toFixed(2)}%):</strong> $${taxAmount.toFixed(2)}</div>
+                    <div><strong>Total tip for the bill:</strong> $${tipAmount.toFixed(2)}</div>
+                    <div style="margin-top:8px;"><strong>Total Bill:</strong> $${grandTotal.toFixed(2)}</div>
+                </div>
+            `;
+        }
+        // Assignment logic
+        let selectedItem = null;
+        let assignments = {};
+        const assignmentInfo = document.getElementById('assignment-info');
+        // Remove manual tip input, use tip from localStorage
+        let taxTipDiv = document.getElementById('tax-tip-inputs');
+        if (taxTipDiv) taxTipDiv.style.display = 'none';
+        // Add event listeners for item selection
+        function addItemListeners() {
+            document.querySelectorAll('.item-row-select').forEach(row => {
+                row.addEventListener('click', function() {
+                    document.querySelectorAll('.item-row-select').forEach(r => r.classList.remove('selected-item'));
+                    row.classList.add('selected-item');
+                    selectedItem = decodeURIComponent(row.getAttribute('data-item'));
+                    assignmentInfo.textContent = `Selected item: ${selectedItem}. Now click a guest to assign.`;
+                });
+            });
+        }
+        // Add event listeners for guest selection
+        function addGuestListeners() {
+            document.querySelectorAll('.guest-row-select').forEach((row, idx) => {
+                row.addEventListener('click', function() {
+                    if (!selectedItem) return;
+                    const guestInput = row.querySelector('.guest-name');
+                    const guestName = guestInput.value.trim();
+                    if (!guestName) return;
+                    if (!assignments[selectedItem]) assignments[selectedItem] = [];
+                    // Toggle assignment
+                    const i = assignments[selectedItem].indexOf(guestName);
+                    if (i === -1) {
+                        assignments[selectedItem].push(guestName);
+                    } else {
+                        assignments[selectedItem].splice(i, 1);
+                    }
+                    updateAssignmentDisplay();
+                });
+            });
+        }
+        // Show assignment info
+        function updateAssignmentDisplay() {
+            // Build a map: guest -> [items]
+            const guestNames = JSON.parse(localStorage.getItem('billSplitter_guestNames') || '[]');
+            const guestToItems = {};
+            guestNames.forEach(name => guestToItems[name] = []);
+            for (const [item, guests] of Object.entries(assignments)) {
+                guests.forEach(guest => {
+                    if (guestToItems[guest]) guestToItems[guest].push(item);
+                });
+            }
+            // Calculate per-person totals
+            const itemsDict = JSON.parse(localStorage.getItem('billSplitter_itemsDict') || '{}');
+            // Get tip value from localStorage (set by script.js)
+            let tipAmount = 0;
+            let tipType = localStorage.getItem('billSplitter_tipType');
+            let tipValue = parseFloat(localStorage.getItem('billSplitter_tipValue'));
+            const total = Object.values(itemsDict).reduce((sum, val) => sum + val, 0);
+            if (tipType === 'percent') {
+                tipAmount = total * (tipValue / 100);
+            } else if (tipType === 'fixed') {
+                tipAmount = tipValue;
+            } else {
+                tipAmount = 0;
+            }
+            // Get tax value (use saved or default to 0.07)
+            let taxRate = parseFloat(localStorage.getItem('billSplitter_taxRate'));
+            if (isNaN(taxRate)) taxRate = 0.07;
+            const tax = total * taxRate;
+            // Calculate subtotal for each guest
+            let perGuestSubtotal = {};
+            let totalSubtotal = 0;
+            for (const guest of guestNames) {
+                let subtotal = 0;
+                if (guestToItems[guest] && guestToItems[guest].length) {
+                    guestToItems[guest].forEach(item => {
+                        const price = parseFloat(itemsDict[item]) || 0;
+                        const numGuests = (assignments[item] || []).length;
+                        if (numGuests > 0) {
+                            subtotal += price / numGuests;
+                        }
+                    });
+                }
+                perGuestSubtotal[guest] = subtotal;
+                totalSubtotal += subtotal;
+            }
+            // Calculate tax share (proportional to subtotal)
+            let perGuestTax = {};
+            for (const guest of guestNames) {
+                perGuestTax[guest] = totalSubtotal > 0 ? (perGuestSubtotal[guest] / totalSubtotal) * tax : 0;
+            }
+            // Tip is split equally
+            let perGuestTip = {};
+            const nGuests = guestNames.length;
+            for (const guest of guestNames) {
+                perGuestTip[guest] = nGuests > 0 ? tipAmount / nGuests : 0;
+            }
+            // Build HTML
+            let html = '';
+            for (const guest of guestNames) {
+                const subtotal = perGuestSubtotal[guest];
+                const taxShare = perGuestTax[guest];
+                const tipShare = perGuestTip[guest];
+                const total = subtotal + taxShare + tipShare;
+                html += `<div class="assignment-person">
+                    <div class="assignment-name">${guest}</div>`;
+                if (guestToItems[guest] && guestToItems[guest].length) {
+                    html += '<ul>';
+                    guestToItems[guest].forEach(item => {
+                        const price = parseFloat(itemsDict[item]) || 0;
+                        const numGuests = (assignments[item] || []).length;
+                        html += `<li>${item} <span style='color:#888;font-size:0.95em;'>(\$${(price/numGuests).toFixed(2)})</span></li>`;
+                    });
+                    html += '</ul>';
+                } else {
+                    html += '<div class="no-items">No items</div>';
+                }
+                html += `<div class="assignment-total">
+                    <div style='margin-top:8px;font-weight:600;'>Subtotal: $${subtotal.toFixed(2)}</div>
+                    <div style='color:#3a5a40;'>Tax: $${taxShare.toFixed(2)}</div>
+                    <div style='color:#3a5a40;'>Tip: $${tipShare.toFixed(2)}</div>
+                    <div style='margin-top:8px;font-size:1.15em;background:#e9fbe5;border-radius:8px;padding:6px 0 4px 0;border:2px dashed #2d6a4f;'>
+                        <span style='font-weight:700;color:#2d6a4f;'>Total: $${total.toFixed(2)}</span>
+                    </div>
+                </div>`;
+                html += '</div>';
+            }
+            assignmentInfo.innerHTML = html;
+            updateTicketSummary();
+        }
+        addItemListeners();
+        addGuestListeners();
+        // Listen for tax/tip input changes
+        document.getElementById('tax-input').addEventListener('input', updateAssignmentDisplay);
+        document.getElementById('tip-input').addEventListener('input', updateAssignmentDisplay);
+        // Call updateAssignmentDisplay on load
+        updateAssignmentDisplay();
+    });
+    </script>
+</body>
+</html>

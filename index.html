@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabzilla</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <img src="img/tabzilla-logo.jpeg" alt="Home" style="display:block;margin:32px auto 18px auto;width:120px;height:120px;object-fit:cover;border-radius:50%;">
+        <h1 style="color:#14532d;font-family:'Impact', 'Arial Black', sans-serif;letter-spacing:2px;font-size:2.7rem;text-align:center;margin:0 auto 18px auto;">Tabzilla</h1>
+        <p>Split your bill easily with friends or roommates!</p>
+
+        <!-- The form and results will go here -->
+        <div class="button-group">
+            <button id="upload-receipt">Upload Receipt</button>
+            <button id="add-manually">Add Manually</button>
+        </div>
+
+        <!-- End button group -->
+        <div id="upload-section" style="display:none; margin-top:32px;">
+            <!--
+            <form id="receipt-form">
+                <label for="receipt-file">Select receipt file:</label>
+                <input type="file" id="receipt-file" name="receipt-file" accept=".jpg,.jpeg,.png,.pdf,.txt">
+                <button type="submit">Submit</button>
+            </form>
+            -->
+            <p> Coming soon... </p>
+        </div>
+
+        
+        <div id="manual-section" style="display:none; margin-top:32px;">
+            <form id="manual-form">
+                <div id="item-list">
+                    <div class="item-row">
+                        <input type="text" class="item-name" placeholder="Item name">
+                        <input type="number" class="item-price" placeholder="Price" min="0" step="0.01">
+                    </div>
+                    <div class="item-row">
+                        <input type="text" class="item-name" placeholder="Item name">
+                        <input type="number" class="item-price" placeholder="Price" min="0" step="0.01">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>
